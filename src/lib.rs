@@ -39,6 +39,7 @@ fn draw_line(chip: &Chip, row: u32, color: u32) {
 }
 
 pub unsafe fn on_timer_fired(user_data: *const c_void) {
+    // a ver, si ya no compilas añadiendo solo un comentario, algo raro pasa
     let mut chip = &mut CHIP_VEC[user_data as usize];
 
     if chip.current_row == 0 {
