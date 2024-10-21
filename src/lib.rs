@@ -41,13 +41,13 @@ fn draw_line(chip: &Chip, row: u32, color: u32) {
 pub unsafe fn on_timer_fired(user_data: *const c_void) {
     // a ver, si ya no compilas añadiendo solo un comentario, algo raro pasa
     let mut chip = &mut CHIP_VEC[user_data as usize];
-    #[repr(C, align(4))] struct AlignedData([u8; 8]);
+/*    #[repr(C, align(4))] struct AlignedData([u8; 8]);
     const IMAGE_DATA: AlignedData = AlignedData 
       ([0,0,1,0,255,1,0,0]);
 
     if IMAGE_DATA.0[4]==255 { 
          debugPrint(CString::new("BIEN!").unwrap().into_raw());
-    }
+    } */
     if chip.current_row == 0 {
         debugPrint(CString::new("First row!").unwrap().into_raw());
     }
