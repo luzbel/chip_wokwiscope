@@ -802,6 +802,12 @@ pub unsafe fn on_timer_fired(user_data: *const c_void) {
         debugPrint(CString::new("First row!").unwrap().into_raw());
     }
 
+    for x in (0..128).step_by(1) {
+        unsafe {
+            bufferWrite(chip.frame_buffer, 0, aligned_data_ptr.add(x * 128), 4 * 128);
+        }
+    }
+
     draw_line(chip, chip.current_row, DEEP_GREEN);
 
     chip.current_row = (chip.current_row + 1) % chip.height;
@@ -834,5 +840,5 @@ pub unsafe extern "C" fn chipInit() {
     };
 
     let timer = timerInit(&timer_config);
-    timerStart(timer, 10 * MS, true);
+    timerStart(timer, 10 * MS, false);
 }
