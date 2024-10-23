@@ -807,11 +807,6 @@ pub unsafe fn on_timer_fired(user_data: *const c_void) {
             bufferWrite(chip.frame_buffer, 0, aligned_data_ptr.add(x * 128), 4 * 128);
         }
     }
-
-    draw_line(chip, chip.current_row, DEEP_GREEN);
-
-    chip.current_row = (chip.current_row + 1) % chip.height;
-    draw_line(chip, chip.current_row, PURPLE);
 }
 
 #[no_mangle]
