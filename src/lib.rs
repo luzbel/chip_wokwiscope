@@ -801,7 +801,7 @@ pub unsafe fn on_timer_fired(user_data: *const c_void) {
     if chip.current_row == 0 {
         debugPrint(CString::new("First row!").unwrap().into_raw());
     }
-
+    /*
     for x in (0..128).step_by(1) {
         unsafe {
             bufferWrite(
@@ -811,6 +811,10 @@ pub unsafe fn on_timer_fired(user_data: *const c_void) {
                 4 * 128,
             );
         }
+    }
+    */
+    unsafe {
+        bufferWrite(chip.frame_buffer, 0, aligned_data_ptr.add(0), 4 * 128 * 128);
     }
 }
 
