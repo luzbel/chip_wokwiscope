@@ -21,6 +21,8 @@ struct Chip {
     width: u32,
     height: u32,
     current_row: u32,
+    ra: f32,
+    dec: f32,
 }
 
 // chipInit() will be called once per chip instance. We use CHIP_VEC to keep track of all the
@@ -42,7 +44,7 @@ pub unsafe fn on_timer_fired(user_data: *const c_void) {
     let mut chip = &mut CHIP_VEC[user_data as usize];
     #[repr(C, align(4))]
     struct AlignedData([u8; 65536]);
-    const xxDATA: AlignedData = AlignedData([
+    const IMAGE_DATA: AlignedData = AlignedData([
         15, 27, 27, 255, 14, 26, 26, 255, 13, 25, 25, 255, 14, 26, 26, 255, 15, 27, 27, 255, 15,
         27, 27, 255, 13, 25, 23, 255, 11, 23, 21, 255, 13, 25, 21, 255, 15, 27, 23, 255, 16, 28,
         24, 255, 15, 27, 23, 255, 11, 24, 17, 255, 9, 22, 15, 255, 10, 23, 16, 255, 13, 26, 19,
@@ -3300,7 +3302,7 @@ pub unsafe fn on_timer_fired(user_data: *const c_void) {
         255, 33, 152, 84, 255, 31, 155, 85, 255, 34, 162, 87, 255, 27, 158, 82, 255, 14, 147, 68,
         255,
     ]);
-    let aligned_data_ptr = &xxDATA.0 as *const u8;
+    let aligned_data_ptr = &IMAGE_DATA.0 as *const u8;
     unsafe {
         bufferWrite(chip.frame_buffer, 0, aligned_data_ptr.add(0), 4 * 128);
     }
@@ -3327,7 +3329,7 @@ pub unsafe fn on_timer_fired(user_data: *const c_void) {
 #[no_mangle]
 pub unsafe extern "C" fn chipInit() {
     debugPrint(
-        CString::new("Hello from Framebuffer Chip!")
+        CString::new("Hello from WokwiScope Chip!")
             .unwrap()
             .into_raw(),
     );
@@ -3341,6 +3343,8 @@ pub unsafe extern "C" fn chipInit() {
         width,
         height,
         current_row: 0,
+        ra: 0.0,
+        dec: 0.0,
     };
     CHIP_VEC.push(chip);
 

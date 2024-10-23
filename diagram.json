@@ -3,7 +3,7 @@
   "author": "Uri Shaked",
   "editor": "wokwi",
   "parts": [
-    { "type": "chip-framebuffer-example", "id": "chip1", "top": -85.38, "left": 168, "attrs": {} },
+    { "type": "chip-wokwiscope", "id": "chip1", "top": -85.38, "left": 168, "attrs": {} },
     { "type": "wokwi-gnd", "id": "gnd1", "top": -28.8, "left": 133.8, "attrs": {} },
     { "type": "wokwi-vcc", "id": "vcc1", "top": -85.64, "left": 144, "attrs": {} }
   ],

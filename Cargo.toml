@@ -1,5 +1,5 @@
 [package]
-name = "chip_framebuffer_example"
+name = "chip_wokwiscope"
 version = "0.1.0"
 edition = "2021"
 
