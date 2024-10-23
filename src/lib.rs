@@ -804,7 +804,7 @@ pub unsafe fn on_timer_fired(user_data: *const c_void) {
 
     for x in (0..128).step_by(1) {
         unsafe {
-            bufferWrite(chip.frame_buffer, 0, aligned_data_ptr.add(x * 128), 4 * 128);
+            bufferWrite(chip.frame_buffer, x * 128, aligned_data_ptr.add(x * 128), 4 * 128);
         }
     }
 }
