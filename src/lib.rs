@@ -41,13 +41,8 @@ fn draw_line(chip: &Chip, row: u32, color: u32) {
 pub unsafe fn on_timer_fired(user_data: *const c_void) {
     let mut chip = &mut CHIP_VEC[user_data as usize];
     #[repr(C, align(4))]
-    struct AlignedData([u8; 8]);
-    const IMAGE_DATA: AlignedData = AlignedData([0, 0, 1, 0, 255, 1, 0, 0]);
-    #[repr(C, align(4))]
-    struct AlignedData([u8; 4]);
-    const xxDATA: AlignedData = AlignedData([0, 0, 1, 0]);
-    ([0, 0, 1, 0, 255, 1, 0, 0]);
-    ([
+    struct AlignedData([u8; 16384]);
+    const xxDATA: AlignedData = AlignedData([
         11, 6, 10, 255, 10, 6, 7, 255, 12, 8, 9, 255, 5, 1, 0, 255, 4, 0, 0, 255, 4, 1, 0, 255, 13,
         8, 2, 255, 13, 9, 0, 255, 24, 20, 11, 255, 19, 15, 6, 255, 18, 10, 7, 255, 19, 11, 8, 255,
         18, 9, 10, 255, 12, 3, 4, 255, 7, 0, 2, 255, 3, 0, 0, 255, 8, 20, 0, 255, 2, 21, 0, 255, 6,
@@ -802,35 +797,8 @@ pub unsafe fn on_timer_fired(user_data: *const c_void) {
     let aligned_data_ptr = &xxDATA.0 as *const u8 as *const u32;
     unsafe {
         let zz = *(aligned_data_ptr.add(0));
-        println!("aligned {}", zz);
+        bufferWrite(chip.frame_buffer, 0, zz, 4*128);
     }
-
-    println!("Hello, world!");
-    let (r, g, b, a) = IMAGE_DATA[0];
-    let (r1, g1, b1, a1) = IMAGE_DATA[1];
-    println!("{}", g);
-    println!("{}", b1);
-    //for x in (0..128).step_by(1) {
-    //  println!("{}" , x*128);
-    //}
-
-    //let col=IMAGE_DATA[1] as const u32 as const u8;
-    //let col=IMAGE_DATA[1];
-    // let col = &IMAGE_DATA[1] as *const u32 as *const u8;
-    //println!("tupla a u32");
-    //println!("{}" , *col);
-
-    let image_data_ptr = IMAGE_DATA.as_ptr() as *const u8;
-    unsafe {
-        let xx = *image_data_ptr.add(1) as u8;
-        println!("*{}*", xx);
-    }
-
-
-    if IMAGE_DATA.0[4] == 255 {
-        debugPrint(CString::new("BIEN!").unwrap().into_raw());
-    }
-
     if chip.current_row == 0 {
         debugPrint(CString::new("First row!").unwrap().into_raw());
     }
