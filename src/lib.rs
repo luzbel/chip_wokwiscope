@@ -7,7 +7,8 @@
 use std::ffi::{c_void, CString};
 
 use wokwi_chip_ll::{
-    bufferWrite, debugPrint, framebufferInit, timerInit, timerStart, BufferId, TimerConfig,
+    bufferWrite, debugPrint, framebufferInit, pinInit, pinWatch, timerInit, timerStart, BufferId,
+    PinId, TimerConfig, WatchConfig, INPUT, RISING,
 };
 
 const MS: u32 = 1000; // micros
@@ -23,6 +24,12 @@ struct Chip {
     current_row: u32,
     ra: f32,
     dec: f32,
+    ra_move: f32,
+    dec_move: f32,
+    pin_ra_dir: PinId,
+    pin_ra_step: PinId,
+    pin_dec_dir: PinId,
+    pin_dec_step: PinId,
 }
 
 // chipInit() will be called once per chip instance. We use CHIP_VEC to keep track of all the
@@ -38,6 +45,54 @@ fn draw_line(chip: &Chip, row: u32, color: u32) {
             bufferWrite(chip.frame_buffer, offset + x, color_bytes_ptr, 4);
         }
     }
+}
+
+pub unsafe fn on_pin_ra_step_change(user_data: *const c_void, _pin: PinId, value: u32) {
+    let mut chip = &mut CHIP_VEC[user_data as usize];
+    /*
+    if value == HIGH {
+        pinWrite(chip.pin_out, LOW);
+    } else {
+        pinWrite(chip.pin_out, HIGH);
+    } */
+    chip.ra = chip.ra + chip.ra_move;
+    debugPrint(CString::new("Ha cambiado ra step").unwrap().into_raw());
+}
+
+pub unsafe fn on_pin_ra_dir_change(user_data: *const c_void, _pin: PinId, value: u32) {
+    let mut chip = &mut CHIP_VEC[user_data as usize];
+    /*
+    if value == HIGH {
+        pinWrite(chip.pin_out, LOW);
+    } else {
+        pinWrite(chip.pin_out, HIGH);
+    } */
+    chip.ra_move = -1.0 * chip.ra_move;
+    debugPrint(CString::new("Ha cambiado ra dir").unwrap().into_raw());
+}
+
+pub unsafe fn on_pin_dec_step_change(user_data: *const c_void, _pin: PinId, value: u32) {
+    let mut chip = &mut CHIP_VEC[user_data as usize];
+    /*
+    if value == HIGH {
+        pinWrite(chip.pin_out, LOW);
+    } else {
+        pinWrite(chip.pin_out, HIGH);
+    } */
+    chip.dec = chip.dec + chip.dec_move;
+    debugPrint(CString::new("Ha cambiado dec step").unwrap().into_raw());
+}
+
+pub unsafe fn on_pin_dec_dir_change(user_data: *const c_void, _pin: PinId, value: u32) {
+    let mut chip = &mut CHIP_VEC[user_data as usize];
+    /*
+    if value == HIGH {
+        pinWrite(chip.pin_out, LOW);
+    } else {
+        pinWrite(chip.pin_out, HIGH);
+    } */
+    chip.dec_move = -1.0 * chip.dec_move;
+    debugPrint(CString::new("Ha cambiado dec dir").unwrap().into_raw());
 }
 
 pub unsafe fn on_timer_fired(user_data: *const c_void) {
@@ -3345,6 +3400,12 @@ pub unsafe extern "C" fn chipInit() {
         current_row: 0,
         ra: 0.0,
         dec: 0.0,
+        ra_move: 0.9,
+        dec_move: 0.9,
+        pin_ra_dir: pinInit(CString::new("RA-DIR").unwrap().into_raw(), INPUT),
+        pin_ra_step: pinInit(CString::new("RA-STEP").unwrap().into_raw(), INPUT),
+        pin_dec_dir: pinInit(CString::new("DEC-DIR").unwrap().into_raw(), INPUT),
+        pin_dec_step: pinInit(CString::new("DEC-STEP").unwrap().into_raw(), INPUT),
     };
     CHIP_VEC.push(chip);
 
@@ -3355,4 +3416,38 @@ pub unsafe extern "C" fn chipInit() {
 
     let timer = timerInit(&timer_config);
     timerStart(timer, 10 * MS, false);
+
+    let watch_config = WatchConfig {
+        user_data: (CHIP_VEC.len() - 1) as *const c_void,
+        edge: RISING,
+        pin_change: on_pin_ra_dir_change as *const c_void,
+    };
+
+    let chip = CHIP_VEC.last().unwrap();
+
+    pinWatch(chip.pin_ra_dir, &watch_config);
+
+    let watch_config = WatchConfig {
+        user_data: (CHIP_VEC.len() - 1) as *const c_void,
+        edge: RISING,
+        pin_change: on_pin_ra_step_change as *const c_void,
+    };
+
+    pinWatch(chip.pin_ra_step, &watch_config);
+
+    let watch_config = WatchConfig {
+        user_data: (CHIP_VEC.len() - 1) as *const c_void,
+        edge: RISING,
+        pin_change: on_pin_dec_dir_change as *const c_void,
+    };
+
+    pinWatch(chip.pin_dec_dir, &watch_config);
+
+    let watch_config = WatchConfig {
+        user_data: (CHIP_VEC.len() - 1) as *const c_void,
+        edge: RISING,
+        pin_change: on_pin_dec_step_change as *const c_void,
+    };
+
+    pinWatch(chip.pin_dec_step, &watch_config);
 }
