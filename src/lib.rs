@@ -794,10 +794,9 @@ pub unsafe fn on_timer_fired(user_data: *const c_void) {
         4, 255, 5, 1, 0, 255, 5, 1, 0, 255, 21, 18, 13, 255, 9, 9, 1, 255, 1, 1, 0, 255, 6, 8, 0,
         255, 4, 6, 0, 255,
     ]);
-    let aligned_data_ptr = &xxDATA.0 as *const u8 as *const u32;
+    let aligned_data_ptr = &xxDATA.0 as *const u8;
     unsafe {
-        let zz = *(aligned_data_ptr.add(0));
-        bufferWrite(chip.frame_buffer, 0, zz, 4*128);
+        bufferWrite(chip.frame_buffer, 0, aligned_data_ptr.add(0), 4 * 128);
     }
     if chip.current_row == 0 {
         debugPrint(CString::new("First row!").unwrap().into_raw());
