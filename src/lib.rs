@@ -807,7 +807,7 @@ pub unsafe fn on_timer_fired(user_data: *const c_void) {
             bufferWrite(
                 chip.frame_buffer,
                 x * 128,
-                aligned_data_ptr.add(x * 128),
+                aligned_data_ptr.add((x * 128).try_into().unwrap()),
                 4 * 128,
             );
         }
