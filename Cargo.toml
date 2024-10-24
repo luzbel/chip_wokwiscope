@@ -6,7 +6,8 @@ edition = "2021"
 [dependencies]
 wokwi_chip_ll = "0.1"
 minreq = "2.12.0"
-image = "0.25.2"
+zune-core = "0.4.12"
+zune-jpeg = "0.4.13"
 
 [lib]
 crate-type = ["cdylib"]
