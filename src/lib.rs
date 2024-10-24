@@ -130,51 +130,66 @@ pub unsafe fn fetch_image(user_data: *const c_void) -> Result<u32, Box<dyn std::
             .into_raw(),
     );
 
-    let response = minreq::get(url).send()?;
-    debugPrint(
-        CString::new("Antes de comprobar status code")
-            .unwrap()
-            .into_raw(),
-    );
-    assert_eq!(200, response.status_code);
-    debugPrint(
-        CString::new("Antes de pasar body a bytes")
-            .unwrap()
-            .into_raw(),
-    );
-    let body = response.as_bytes();
-
-    /*
-    let img = image::load_from_memory(&body)?.to_rgba8();
-    let rgba = img.as_raw();
-    unsafe {
-        bufferWrite(chip.frame_buffer, 0, img.as_ptr(), 4 * 128 * 128);
+    match minreq::get(url).send() {
+        Ok(response) => {
+            let msg = format!("status {}", response.status_code);
+            debugPrint(CString::new(msg).unwrap().into_raw());
+            if response.status_code == 200 {
+                match response.headers.get("content-type") {
+                    Some(value) => {
+                        let msg = format!("content-type {}", value);
+                        debugPrint(CString::new(msg).unwrap().into_raw());
+                        if value == "image/jpeg" {
+                            debugPrint(
+                                CString::new("bien, se ha recibido jpeg")
+                                    .unwrap()
+                                    .into_raw(),
+                            );
+                            let body = response.as_bytes();
+                            debugPrint(
+                                CString::new("antes de inicializar rgba")
+                                    .unwrap()
+                                    .into_raw(),
+                            );
+                            let mut options = zune_core::options::DecoderOptions::default()
+                                .jpeg_set_out_colorspace(zune_core::colorspace::ColorSpace::RGBA);
+                            debugPrint(
+                                CString::new("antes de crear decoder jpeg")
+                                    .unwrap()
+                                    .into_raw(),
+                            );
+                            let mut decoder =
+                                zune_jpeg::JpegDecoder::new_with_options(body, options);
+                            debugPrint(CString::new("antes de decodificar").unwrap().into_raw());
+                            match decoder.decode() {
+                                Ok(pixels) => {
+                                    debugPrint(
+                                        CString::new("antes de volcar al framebuffer")
+                                            .unwrap()
+                                            .into_raw(),
+                                    );
+                                    unsafe {
+                                        bufferWrite(
+                                            chip.frame_buffer,
+                                            0,
+                                            pixels.as_ptr(),
+                                            4 * 128 * 128,
+                                        );
+                                    }
+                                    debugPrint(CString::new("antes de salir").unwrap().into_raw());
+                                }
+                                Err(error) => {
+                                    debugPrint(CString::new("ERR decode").unwrap().into_raw())
+                                }
+                            }
+                        }
+                    }
+                    None => debugPrint(CString::new("no hay content-type").unwrap().into_raw()),
+                }
+            }
+        }
+        Err(error) => {}
     }
-    */
-    debugPrint(
-        CString::new("Antes de inicializar rgba")
-            .unwrap()
-            .into_raw(),
-    );
-    let mut options = zune_core::options::DecoderOptions::default()
-        .jpeg_set_out_colorspace(zune_core::colorspace::ColorSpace::RGBA);
-    debugPrint(
-        CString::new("Antes de crear decoder jpeg")
-            .unwrap()
-            .into_raw(),
-    );
-    let mut decoder = zune_jpeg::JpegDecoder::new_with_options(body, options);
-    debugPrint(CString::new("Antes de decodificar").unwrap().into_raw());
-    let pixels = decoder.decode()?;
-    debugPrint(
-        CString::new("Antes de volcar al buffer")
-            .unwrap()
-            .into_raw(),
-    );
-    unsafe {
-        bufferWrite(chip.frame_buffer, 0, pixels.as_ptr(), 4 * 128 * 128);
-    }
-    debugPrint(CString::new("Antes de salir").unwrap().into_raw());
     Ok(0)
 }
 
