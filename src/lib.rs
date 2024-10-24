@@ -137,13 +137,14 @@ pub async unsafe fn fetch_image(
         bufferWrite(chip.frame_buffer, 0, img.as_ptr(), 4 * 128 * 128);
     }
     */
-    let mut options = zune_core::options::DecoderOptions::default().jpeg_set_out_colorspace(zune_core::colorspace::ColorSpace::RGBA);
-    let mut decoder = zune_jpeg::JpegDecoder::new_with_options(body,options);
-    let pixels = decoder.decode()?; 
+    let mut options = zune_core::options::DecoderOptions::default()
+        .jpeg_set_out_colorspace(zune_core::colorspace::ColorSpace::RGBA);
+    let mut decoder = zune_jpeg::JpegDecoder::new_with_options(body, options);
+    let pixels = decoder.decode()?;
     unsafe {
         bufferWrite(chip.frame_buffer, 0, pixels.as_ptr(), 4 * 128 * 128);
-    } 
-     Ok(0)
+    }
+    Ok(0)
 }
 
 pub unsafe fn on_timer_fired(user_data: *const c_void) {
