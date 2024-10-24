@@ -188,7 +188,10 @@ pub unsafe fn fetch_image(user_data: *const c_void) -> Result<u32, Box<dyn std::
                 }
             }
         }
-        Err(error) => {}
+        Err(error) => {
+            let msg = format!("request error {}", error);
+            debugPrint(CString::new(msg).unwrap().into_raw());
+        }
     }
     Ok(0)
 }
