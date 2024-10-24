@@ -6,7 +6,6 @@ edition = "2021"
 [dependencies]
 wokwi_chip_ll = "0.1"
 reqwest = "0.12.8"
-image = "0.25.2"
 
 [lib]
 crate-type = ["cdylib"]
