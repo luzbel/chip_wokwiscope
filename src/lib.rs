@@ -126,8 +126,24 @@ pub async unsafe fn fetch_image(
     }
     */
 
+    debugPrint(
+        CString::new("Antes de obtener la imagen")
+            .unwrap()
+            .into_raw(),
+    );
+
     let response = minreq::get(url).send()?;
+    debugPrint(
+        CString::new("Antes de comprobar status code")
+            .unwrap()
+            .into_raw(),
+    );
     assert_eq!(200, response.status_code);
+    debugPrint(
+        CString::new("Antes de pasar body a bytes")
+            .unwrap()
+            .into_raw(),
+    );
     let body = response.as_bytes();
 
     /*
@@ -137,13 +153,30 @@ pub async unsafe fn fetch_image(
         bufferWrite(chip.frame_buffer, 0, img.as_ptr(), 4 * 128 * 128);
     }
     */
+    debugPrint(
+        CString::new("Antes de inicializar rgba")
+            .unwrap()
+            .into_raw(),
+    );
     let mut options = zune_core::options::DecoderOptions::default()
         .jpeg_set_out_colorspace(zune_core::colorspace::ColorSpace::RGBA);
+    debugPrint(
+        CString::new("Antes de crear decoder jpeg")
+            .unwrap()
+            .into_raw(),
+    );
     let mut decoder = zune_jpeg::JpegDecoder::new_with_options(body, options);
+    debugPrint(CString::new("Antes de decodificar").unwrap().into_raw());
     let pixels = decoder.decode()?;
+    debugPrint(
+        CString::new("Antes de volcar al buffer")
+            .unwrap()
+            .into_raw(),
+    );
     unsafe {
         bufferWrite(chip.frame_buffer, 0, pixels.as_ptr(), 4 * 128 * 128);
     }
+    debugPrint(CString::new("Antes de salir").unwrap().into_raw());
     Ok(0)
 }
 
