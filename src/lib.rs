@@ -100,9 +100,7 @@ pub unsafe fn on_pin_dec_dir_change(user_data: *const c_void, _pin: PinId, value
 }
 
 // TODO: separar el fetch del volcado de la imagen
-pub async unsafe fn fetch_image(
-    user_data: *const c_void,
-) -> Result<u32, Box<dyn std::error::Error>> {
+pub unsafe fn fetch_image(user_data: *const c_void) -> Result<u32, Box<dyn std::error::Error>> {
     let mut chip = &mut CHIP_VEC[user_data as usize];
 
     let url = format!(
@@ -240,7 +238,7 @@ pub unsafe extern "C" fn chipInit() {
     };
 
     let timer = timerInit(&timer_config);
-    timerStart(timer, 10 * MS, false);
+    timerStart(timer, 60000 * MS, true);
 
     let watch_config = WatchConfig {
         user_data: (CHIP_VEC.len() - 1) as *const c_void,
