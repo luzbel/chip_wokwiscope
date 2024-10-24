@@ -183,6 +183,7 @@ pub async unsafe fn fetch_image(
 pub unsafe fn on_timer_fired(user_data: *const c_void) {
     //let mut chip = &mut CHIP_VEC[user_data as usize];
 
+    debugPrint(CString::new("on_timer_fired").unwrap().into_raw());
     fetch_image(user_data);
     /*
     match fetch_image(user_data) {
@@ -239,7 +240,7 @@ pub unsafe extern "C" fn chipInit() {
     };
 
     let timer = timerInit(&timer_config);
-    timerStart(timer, 60000 * MS, true);
+    timerStart(timer, 10 * MS, false);
 
     let watch_config = WatchConfig {
         user_data: (CHIP_VEC.len() - 1) as *const c_void,
