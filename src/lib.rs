@@ -128,6 +128,12 @@ pub async unsafe fn fetch_image(
 
     let response = minreq::get(url).send()?;
     assert_eq!(200, response.status_code);
+    let body = response.as_bytes();
+    let img = image::load_from_memory(&body)?.to_rgba8();
+    let rgba = img.as_raw();
+    unsafe {
+        bufferWrite(chip.frame_buffer, 0, img.as_ptr(), 4 * 128 * 128);
+    }
     Ok(0)
 }
 
