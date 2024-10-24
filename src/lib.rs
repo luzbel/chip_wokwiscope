@@ -11,7 +11,7 @@ use wokwi_chip_ll::{
     PinId, TimerConfig, WatchConfig, INPUT, RISING,
 };
 
-use reqwest::get;
+//use reqwest::get;
 //use image::{load_from_memory, ImageFormat};
 //use image::load_from_memory;
 
@@ -109,13 +109,14 @@ pub async unsafe fn fetch_image(
         "https://skyserver.sdss.org/dr12/SkyserverWS/ImgCutout/getjpeg?TaskName=Skyserver.Chart.Image&ra={}&dec={}&scale=80&width=128&height=128&opt=&query=",
         chip.ra, chip.dec
     );
-
+    /*
     let res = reqwest::get(url)
         .await
         .expect("failed to get response")
         .bytes()
         .await
         .expect("failed to get payload");
+    */
     /*
     let body = load_from_memory(&res)?.to_rgba8();
     let img = body.as_raw();
@@ -124,6 +125,9 @@ pub async unsafe fn fetch_image(
         bufferWrite(chip.frame_buffer, 0, img.as_ptr(), 4 * 128 * 128);
     }
     */
+
+    let response = minreq::get(url).send()?;
+    assert_eq!(200, response.status_code);
     Ok(0)
 }
 
