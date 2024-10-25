@@ -103,10 +103,13 @@ pub unsafe fn on_pin_dec_dir_change(user_data: *const c_void, _pin: PinId, value
 pub unsafe fn fetch_image(user_data: *const c_void) -> Result<u32, Box<dyn std::error::Error>> {
     let mut chip = &mut CHIP_VEC[user_data as usize];
 
+    /*
     let url = format!(
         "https://skyserver.sdss.org/dr12/SkyserverWS/ImgCutout/getjpeg?TaskName=Skyserver.Chart.Image&ra={}&dec={}&scale=80&width=128&height=128&opt=&query=",
         chip.ra, chip.dec
     );
+    */
+    let url = "http://httpbin.org/image/jpeg";
     /*
     let res = reqwest::get(url)
         .await
