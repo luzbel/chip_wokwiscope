@@ -7,7 +7,7 @@ edition = "2021"
 wokwi_chip_ll = "0.1"
 ring = { version = "0.17.8", features = ["wasm32_unknown_unknown_js"] }
 getrandom = { version = "0.2.15", features = ["js"] }
-minreq = "2.12.0"
+minreq = { version = "2.12.0" , features = ["https"] }
 zune-core = "0.4.12"
 zune-jpeg = "0.4.13"
 
